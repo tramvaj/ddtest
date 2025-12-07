@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Simple Calculator</title>
+  <title>Meme Calculator 3000</title>
   <style>
     * {
       box-sizing: border-box;
@@ -15,9 +15,45 @@
       background-color: #111827;
       color: #e5e7eb;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
       min-height: 100vh;
+    }
+
+    header, footer {
+      text-align: center;
+      padding: 20px 10px;
+      background-color: #0f172a;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    header img {
+      height: 60px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      color: #fbbf24;
+    }
+
+    header p {
+      margin: 5px 0 0 0;
+      font-size: 14px;
+      color: #a5b4fc;
+    }
+
+    footer {
+      margin-top: auto;
+      border-top: 1px solid #1e293b;
+      border-bottom: none;
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    footer span {
+      color: #f472b6;
     }
 
     .calculator-wrapper {
@@ -27,6 +63,7 @@
       box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
       width: 320px;
       max-width: 90vw;
+      margin: 30px auto;
     }
 
     .calc-header {
@@ -124,8 +161,16 @@
   </style>
 </head>
 <body>
+
+  <header>
+    <img src="meme.jpeg" alt="meme logo">
+    <h1>Meme Calculator 3000</h1>
+    <p>Making math slightly less painful since last Tuesday</p>
+  </header>
+
   <div class="calculator-wrapper">
-    <div class="calc-header">Calculator</div>
+    <div class="calc-header">Definitely accurate 60 percent of the time</div>
+
     <div class="display">
       <div id="expression" class="display-expression"></div>
       <div id="result" class="display-value">0</div>
@@ -157,6 +202,10 @@
       <button class="equal" data-action="equals">=</button>
     </div>
   </div>
+
+  <footer>
+    Powered by chaotic vibes and <span>questionable math decisions</span>
+  </footer>
 
   <script>
     (function () {
@@ -199,11 +248,9 @@
       }
 
       function sanitizeExpression(expr) {
-        // Allow only digits, operators, percent, decimal, parentheses and spaces
         if (!/^[0-9+\-*/%.() ]*$/.test(expr)) {
           return null;
         }
-        // Convert percent: "50%" to "(50/100)"
         return expr.replace(/([0-9.]+)%/g, "(($1)/100)");
       }
 
