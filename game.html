@@ -79,10 +79,10 @@
 <body>
 
   <h1>Anti Aircraft Meme Defense</h1>
-  <div class="subtitle">Left Right to move, Space to shoot, panic in between</div>
+  <div class="subtitle">Left right to move, space to shoot, panic in between</div>
 
   <div class="info">
-    Hit the flying metal birds for <span>10 points</span> each. Miss too many and they laugh at you silently.
+    Hit the military planes for <span>10 points</span> each. The pilots are judging your aim.
   </div>
 
   <div class="game-container">
@@ -90,7 +90,7 @@
   </div>
 
   <footer>
-    Pro tip: if you blame input lag for missing, you gain <span>zero</span> extra points but one extra excuse.
+    Historical fact: shouting "pew" increases accuracy by <span>zero</span> percent.
   </footer>
 
   <script>
@@ -103,9 +103,9 @@
 
       const player = {
         x: WIDTH / 2,
-        y: HEIGHT - 40,
-        width: 40,
-        height: 20,
+        y: HEIGHT - 60,
+        width: 30,
+        height: 28,
         speed: 300
       };
 
@@ -128,10 +128,11 @@
 
       function spawnPlane() {
         const fromLeft = Math.random() < 0.5;
-        const speed = 80 + Math.random() * 70;
+        // 3x faster
+        const speed = 3 * (80 + Math.random() * 70);
         const y = 60 + Math.random() * 40;
-        const width = 40;
-        const height = 16;
+        const width = 60;
+        const height = 22;
 
         planes.push({
           x: fromLeft ? -width - 10 : WIDTH + 10,
@@ -139,17 +140,18 @@
           width: width,
           height: height,
           vx: fromLeft ? speed : -speed,
-          alive: true
+          alive: true,
+          dirLeft: !fromLeft
         });
       }
 
       function shoot() {
         bullets.push({
           x: player.x,
-          y: player.y - 10,
+          y: player.y - 18,
           width: 4,
-          height: 12,
-          vy: -450,
+          height: 14,
+          vy: -500,
           alive: true
         });
       }
@@ -163,8 +165,8 @@
         }
 
         const halfW = player.width / 2;
-        if (player.x - halfW < 10) player.x = 10 + halfW;
-        if (player.x + halfW > WIDTH - 10) player.x = WIDTH - 10 - halfW;
+        if (player.x - halfW < 20) player.x = 20 + halfW;
+        if (player.x + halfW > WIDTH - 20) player.x = WIDTH - 20 - halfW;
 
         shootCooldown -= dt;
         if (keys.space && shootCooldown <= 0) {
@@ -197,7 +199,7 @@
             continue;
           }
           p.x += p.vx * dt;
-          if (p.x + p.width < -50 || p.x - p.width > WIDTH + 50) {
+          if (p.x + p.width < -80 || p.x - p.width > WIDTH + 80) {
             planes.splice(i, 1);
           }
         }
@@ -220,10 +222,10 @@
 
       function rectsOverlap(a, b) {
         return (
-          a.x < b.x + b.width &&
-          a.x + a.width > b.x &&
-          a.y < b.y + b.height &&
-          a.y + a.height > b.y
+          a.x - a.width / 2 < b.x + b.width &&
+          a.x + a.width / 2 > b.x &&
+          a.y - a.height / 2 < b.y + b.height &&
+          a.y + a.height / 2 > b.y
         );
       }
 
@@ -233,13 +235,13 @@
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
         ctx.fillStyle = "#1e293b";
-        ctx.fillRect(0, HEIGHT - 40, WIDTH, 40);
+        ctx.fillRect(0, HEIGHT - 50, WIDTH, 50);
 
         ctx.strokeStyle = "#111827";
         ctx.lineWidth = 2;
         for (let i = 0; i < WIDTH; i += 40) {
           ctx.beginPath();
-          ctx.moveTo(i, HEIGHT - 40);
+          ctx.moveTo(i, HEIGHT - 50);
           ctx.lineTo(i + 20, HEIGHT);
           ctx.stroke();
         }
@@ -249,7 +251,7 @@
         ctx.textAlign = "left";
         ctx.fillText("Score: " + score, 16, 30);
 
-        ctx.fillStyle = "rgba(148, 163, 184, 0.6)";
+        ctx.fillStyle = "rgba(148, 163, 184, 0.75)";
         ctx.font = "14px system-ui, sans-serif";
         ctx.textAlign = "right";
         ctx.fillText("Arrows to move, Space to shoot", WIDTH - 16, 30);
@@ -261,26 +263,43 @@
         const x = player.x;
         const y = player.y;
 
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(x - 30, y + 10, 60, 10);
+        // Concrete base
+        ctx.fillStyle = "#111827";
+        ctx.fillRect(x - 50, y + 18, 100, 20);
 
-        ctx.fillStyle = "#e5e7eb";
-        ctx.fillRect(x - player.width / 2, y, player.width, player.height);
-
-        ctx.fillStyle = "#64748b";
-        ctx.fillRect(x - 4, y - 16, 8, 16);
-
-        ctx.fillStyle = "#10b981";
+        // Rotating platform
+        ctx.fillStyle = "#1f2937";
         ctx.beginPath();
-        ctx.arc(x, y + 10, 4, 0, Math.PI * 2);
+        ctx.arc(x, y + 18, 22, 0, Math.PI, true);
         ctx.fill();
+
+        // Gun mount
+        ctx.fillStyle = "#4b5563";
+        ctx.fillRect(x - 10, y - 6, 20, 22);
+
+        // Barrel
+        ctx.save();
+        ctx.translate(x, y - 4);
+        const barrelLength = 60;
+        const barrelWidth = 8;
+        ctx.fillStyle = "#9ca3af";
+        ctx.fillRect(-barrelWidth / 2, -barrelLength, barrelWidth, barrelLength);
+
+        // Muzzle brake
+        ctx.fillStyle = "#e5e7eb";
+        ctx.fillRect(-barrelWidth / 2 - 2, -barrelLength - 8, barrelWidth + 4, 8);
+        ctx.restore();
+
+        // Tiny gunner window
+        ctx.fillStyle = "#22c55e";
+        ctx.fillRect(x - 6, y, 12, 8);
 
         ctx.restore();
       }
 
       function drawBullets() {
         ctx.save();
-        ctx.fillStyle = "#22c55e";
+        ctx.fillStyle = "#f97316";
         bullets.forEach(b => {
           ctx.fillRect(b.x - b.width / 2, b.y, b.width, b.height);
         });
@@ -290,37 +309,79 @@
       function drawPlanes() {
         ctx.save();
         planes.forEach(p => {
+          ctx.save();
           ctx.translate(p.x, p.y);
+          if (p.vx < 0) {
+            ctx.scale(-1, 1); // flip when flying left
+          }
 
-          ctx.fillStyle = "#e5e7eb";
+          const bodyLen = p.width;
+          const bodyHeight = 12;
+
+          // Fuselage
+          ctx.fillStyle = "#4b5563";
           ctx.beginPath();
-          ctx.moveTo(-p.width / 2, 0);
-          ctx.lineTo(p.width / 2, 0);
-          ctx.lineTo(p.width / 2 - 6, p.height);
-          ctx.lineTo(-p.width / 2 + 6, p.height);
+          ctx.roundRect(-bodyLen / 2, -bodyHeight / 2, bodyLen, bodyHeight, 4);
+          ctx.fill();
+
+          // Nose
+          ctx.fillStyle = "#9ca3af";
+          ctx.beginPath();
+          ctx.moveTo(bodyLen / 2, -bodyHeight / 2);
+          ctx.lineTo(bodyLen / 2 + 14, 0);
+          ctx.lineTo(bodyLen / 2, bodyHeight / 2);
           ctx.closePath();
           ctx.fill();
 
-          ctx.fillStyle = "#0f172a";
-          ctx.fillRect(-p.width / 2 + 8, 2, p.width - 16, p.height - 6);
+          // Tail fin
+          ctx.fillStyle = "#6b7280";
+          ctx.beginPath();
+          ctx.moveTo(-bodyLen / 2 + 6, -bodyHeight / 2);
+          ctx.lineTo(-bodyLen / 2 - 6, -bodyHeight / 2 - 12);
+          ctx.lineTo(-bodyLen / 2 + 2, -bodyHeight / 2);
+          ctx.closePath();
+          ctx.fill();
 
+          // Main wings
+          ctx.fillStyle = "#374151";
+          ctx.beginPath();
+          ctx.moveTo(-10, 0);
+          ctx.lineTo(-50, 18);
+          ctx.lineTo(-10, 10);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(10, 0);
+          ctx.lineTo(50, 18);
+          ctx.lineTo(10, 10);
+          ctx.closePath();
+          ctx.fill();
+
+          // Underslung engines
+          ctx.fillStyle = "#1f2937";
+          ctx.beginPath();
+          ctx.roundRect(-24, 8, 16, 8, 3);
+          ctx.roundRect(8, 8, 16, 8, 3);
+          ctx.fill();
+
+          // Cockpit
           ctx.fillStyle = "#38bdf8";
           ctx.beginPath();
-          ctx.arc(-10, p.height / 2 + 1, 3, 0, Math.PI * 2);
-          ctx.arc(0, p.height / 2 + 1, 3, 0, Math.PI * 2);
-          ctx.arc(10, p.height / 2 + 1, 3, 0, Math.PI * 2);
+          ctx.ellipse(10, -8, 12, 6, 0, 0, Math.PI * 2);
           ctx.fill();
 
-          ctx.fillStyle = "rgba(248, 250, 252, 0.5)";
+          // Roundel
+          ctx.fillStyle = "#f87171";
           ctx.beginPath();
-          ctx.moveTo(p.width / 2, p.height / 2);
-          ctx.lineTo(p.width / 2 + 18, p.height / 2 + 4);
-          ctx.quadraticCurveTo(p.width / 2 + 26, p.height, p.width / 2 + 10, p.height + 6);
-          ctx.lineTo(p.width / 2, p.height);
-          ctx.closePath();
+          ctx.arc(-8, 0, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#e5e7eb";
+          ctx.beginPath();
+          ctx.arc(-8, 0, 3, 0, Math.PI * 2);
           ctx.fill();
 
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.restore();
         });
         ctx.restore();
       }
